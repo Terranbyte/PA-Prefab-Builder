@@ -72,7 +72,7 @@ namespace PA_PrefabBuilder
     }
 
     /// <summary>
-    /// Object event
+    /// GameObject event
     /// </summary>
     public class Event
     {
@@ -80,9 +80,7 @@ namespace PA_PrefabBuilder
         public Easing Ease = Easing.Linear;
         public RandomMode Random = RandomMode.None;
 
-        public float Time, X = 0, Y = 0;
-
-        public int RandomX = 0, RandomY = 0, RandomInterval = 0;
+        public float Time, X = 0, Y = 0, RandomX = 0, RandomY = 0, RandomInterval = 0;
 
         public Event(EventType type, float time)
         {
@@ -164,7 +162,7 @@ namespace PA_PrefabBuilder
     /// <summary>
     /// Game object
     /// </summary>
-    public class Object
+    public class GameObject
     {
         public string ID = "", Name = "", Parent = "", Text = "Sample text (Original meme ikr)";
         public bool Helper = false, Autokill = true, Empty = false;
@@ -185,58 +183,70 @@ namespace PA_PrefabBuilder
         readonly List<Event> RotEvents = new List<Event> { new Event(EventType.rot, 0) };
         readonly List<Event> ColEvents = new List<Event> { new Event(EventType.col, 0) };
 
-        public Object(string ID, string Name, Shapes Shape)
+        public GameObject(string ID, string Name, Shapes Shape)
         {
             this.ID = ID;
             this.Name = Name;
             this.Shape = Shape;
         }
 
-        public Object(string ID, string Name, Shapes Shape, string Parent)
-        {
-            this.ID = ID;
-            this.Name = Name;
-            this.Shape = Shape;
-            this.Parent = Parent;
-        }
-
-        public Object(string ID, string Name, Shapes Shape, string Parent, int ParentSettings)
+        public GameObject(string ID, string Name, Shapes Shape, string Parent)
         {
             this.ID = ID;
             this.Name = Name;
             this.Shape = Shape;
             this.Parent = Parent;
-            this.ParentSettings = ParentSettings;
         }
 
-        public Object(string ID, string Name, Shapes Shape, float StartX, float StartY)
-        {
-            this.ID = ID;
-            this.Name = Name;
-            this.Shape = Shape;
-            PosEvents[0].X = StartX;
-            PosEvents[0].Y = StartY;
-        }
-
-        public Object(string ID, string Name, Shapes Shape, float StartX, float StartY, string Parent)
-        {
-            this.ID = ID;
-            this.Name = Name;
-            this.Parent = Parent;
-            this.Shape = Shape;
-            PosEvents[0].X = StartX;
-            PosEvents[0].Y = StartY;
-        }
-
-        public Object(string ID, string Name, Shapes Shape, float StartX, float StartY, string Parent, int ParentSettings)
+        public GameObject(string ID, string Name, Shapes Shape, string Parent, int ParentSettings)
         {
             this.ID = ID;
             this.Name = Name;
             this.Shape = Shape;
             this.Parent = Parent;
             this.ParentSettings = ParentSettings;
-            PosEvents[0].X = StartX;
-            PosEvents[0].Y = StartY;
+        }
+
+        /// <summary>
+        /// Sets the starting position of this object
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        public void SetPosition(float X, float Y, RandomMode Random, float RandomX, float RandomY, float RandomInterval)
+        {
+            PosEvents[0].X = X;
+            PosEvents[0].Y = Y;
+            PosEvents[0].Random = Random;
+            PosEvents[0].RandomX = RandomX;
+            PosEvents[0].RandomY = RandomY;
+            PosEvents[0].RandomInterval = RandomInterval;
+        }
+
+        /// <summary>
+        /// Sets the starting scale of this object
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        public void SetScale(float X, float Y, RandomMode Random, float RandomX, float RandomY, float RandomInterval)
+        {
+            ScaEvents[0].X = X;
+            ScaEvents[0].Y = Y;
+            ScaEvents[0].Random = Random;
+            ScaEvents[0].RandomX = RandomX;
+            ScaEvents[0].RandomY = RandomY;
+            ScaEvents[0].RandomInterval = RandomInterval;
+        }
+
+        /// <summary>
+        /// Sets the starting rotation of this object
+        /// </summary>
+        /// <param name="Angle"></param>
+        public void SetRotation(float Angle, RandomMode Random, float RandomAngle, float RandomInterval)
+        {
+            RotEvents[0].X = Angle;
+            RotEvents[0].Random = Random;
+            RotEvents[0].RandomX = RandomAngle;
+            RotEvents[0].RandomInterval = RandomInterval;
         }
 
         /// <summary>
@@ -321,7 +331,7 @@ namespace PA_PrefabBuilder
         /// <param name="X"></param>
         /// <param name="Y"></param>
         /// <param name="Ease"></param>
-        public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease, RandomMode Random, int RandomX, int RandomY)
+        public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease, RandomMode Random, float RandomX, float? RandomY)
         {
             Event e = new Event(Type, Time);
 
@@ -331,7 +341,8 @@ namespace PA_PrefabBuilder
             e.Ease = Ease;
             e.Random = Random;
             e.RandomX = RandomX;
-            e.RandomY = RandomY;
+            if (RandomY != null)
+                e.RandomY = (float)RandomY;
 
             switch (Type)
             {
@@ -433,7 +444,7 @@ namespace PA_PrefabBuilder
         private string Name;
         private PrefabType Type;
         private int Offset;
-        public List<Object> Objects = new List<Object>();
+        public List<GameObject> Objects = new List<GameObject>();
 
         public PrefabBuilder(string name, PrefabType type, int offset)
         {
