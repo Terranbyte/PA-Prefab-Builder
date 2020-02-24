@@ -287,7 +287,7 @@ namespace PA_PrefabBuilder
         /// <param name="X"></param>
         /// <param name="Y"></param>
         /// <param name="Ease"></param>
-        public void AddEvent(EventType Type, int Time, float X, float? Y, Easing Ease)
+        public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease)
         {
             Event e = new Event(Type, Time);
 
