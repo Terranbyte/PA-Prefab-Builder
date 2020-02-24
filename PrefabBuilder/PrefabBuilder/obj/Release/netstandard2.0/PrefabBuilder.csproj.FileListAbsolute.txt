@@ -1,0 +1,8 @@
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\bin\Release\netstandard2.0\PrefabBuilder.deps.json
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\bin\Release\netstandard2.0\PrefabBuilder.dll
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\bin\Release\netstandard2.0\PrefabBuilder.pdb
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\obj\Release\netstandard2.0\PrefabBuilder.csproj.CoreCompileInputs.cache
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\obj\Release\netstandard2.0\PrefabBuilder.AssemblyInfoInputs.cache
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\obj\Release\netstandard2.0\PrefabBuilder.AssemblyInfo.cs
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\obj\Release\netstandard2.0\PrefabBuilder.dll
+C:\Users\fredrik.nikielhard\source\repos\PrefabBuilder\PrefabBuilder\obj\Release\netstandard2.0\PrefabBuilder.pdb
