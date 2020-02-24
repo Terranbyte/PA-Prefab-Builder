@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -71,6 +71,9 @@ namespace PA_PrefabBuilder
         Scale = 4
     }
 
+    /// <summary>
+    /// Object event
+    /// </summary>
     public class Event
     {
         public EventType Type;
@@ -92,6 +95,10 @@ namespace PA_PrefabBuilder
             }
         }
 
+        /// <summary>
+        /// Converts this event to a json format
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             string Out;
@@ -154,6 +161,9 @@ namespace PA_PrefabBuilder
         }
     }
 
+    /// <summary>
+    /// Game object
+    /// </summary>
     public class Object
     {
         public string ID = "", Name = "", Parent = "", Text = "Sample text (Original meme ikr)";
@@ -229,28 +239,54 @@ namespace PA_PrefabBuilder
             PosEvents[0].Y = StartY;
         }
 
+        /// <summary>
+        /// Sets the starting position of this object
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
         public void SetPosition(float X, float Y)
         {
             PosEvents[0].X = X;
             PosEvents[0].Y = Y;
         }
 
+        /// <summary>
+        /// Sets the starting scale of this object
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
         public void SetScale(float X, float Y)
         {
             ScaEvents[0].X = X;
             ScaEvents[0].Y = Y;
         }
 
+        /// <summary>
+        /// Sets the starting rotation of this object
+        /// </summary>
+        /// <param name="Angle"></param>
         public void SetRotation(float Angle)
         {
             RotEvents[0].X = Angle;
         }
 
+        /// <summary>
+        /// Sets the starting color of this object
+        /// </summary>
+        /// <param name="Color"></param>
         public void SetColor(int Color)
         {
             ColEvents[0].X = Color;
         }
 
+        /// <summary>
+        /// Adds an event to this object
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <param name="Time"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="Ease"></param>
         public void AddEvent(EventType Type, int Time, float X, float? Y, Easing Ease)
         {
             Event e = new Event(Type, Time);
@@ -277,6 +313,14 @@ namespace PA_PrefabBuilder
             }
         }
 
+        /// <summary>
+        /// Adds an event to this object
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <param name="Time"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="Ease"></param>
         public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease, RandomMode Random, int RandomX, int RandomY)
         {
             Event e = new Event(Type, Time);
@@ -306,6 +350,10 @@ namespace PA_PrefabBuilder
             }
         }
 
+        /// <summary>
+        /// Converts this object to a json format
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var StringEvents = "\"events\":{\"pos\":[";
@@ -394,6 +442,10 @@ namespace PA_PrefabBuilder
             Offset = offset;
         }
 
+        /// <summary>
+        /// Finalizes and exports this prefab to a prefab file
+        /// </summary>
+        /// <param name="PrefabFolder"></param>
         public void Export(string PrefabFolder)
         {
             if (Objects.Count > 0)
@@ -416,6 +468,10 @@ namespace PA_PrefabBuilder
             }
         }
 
+        /// <summary>
+        /// Converts this prefab to a json format
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             string StrObjects = "";
