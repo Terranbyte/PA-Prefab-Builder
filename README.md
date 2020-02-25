@@ -6,7 +6,7 @@ This library is unfinished, this means it has bugs, missing features and other t
 If you encounter any bugs/mistakes or you have a feature request, please DM me on Discord (Terranbyte#1691)
 ## Installing the library (VS 2019)
 
- 1. Download the DLL from [here](https://github.com/Terranbyte/PA-Prefab-Builder/releases/download/0.1/PrefabBuilder.dll).
+ 1. Download the DLL from [here](https://github.com/Terranbyte/PA-Prefab-Builder/releases/download/v0.5/PrefabBuilder.dll).
  2. Right-click the References tab in your solution explorer.
  3. Click "Add reference...".
  4. Locate and select the DLL.
@@ -35,6 +35,10 @@ obj.SetColor();
 When exporting a prefab, use the Export function on your PrefabBuilder object with the prefab folder as the parameter
 ```cs
 pb.Export(@"C:\Program Files (x86)\Steam\steamapps\common\Project Arrhythmia\beatmaps\prefabs");
+```
+To import prefabs call ImportPrefab on the PrefabBuilder class, then specify the path to the prefab you want to import.
+```cs
+pb.ImportPrefab(@"C:\Program Files (x86)\Steam\steamapps\common\Project Arrhythmia\beatmaps\prefabs\prefab.lsp");
 ```
 # Examples
 **Generating a single object**
