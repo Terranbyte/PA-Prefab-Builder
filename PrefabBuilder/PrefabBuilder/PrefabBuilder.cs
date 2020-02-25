@@ -72,7 +72,7 @@ namespace PA_PrefabBuilder
     }
 
     /// <summary>
-    /// GameObject event
+    /// GameObject event.
     /// </summary>
     public class Event
     {
@@ -94,7 +94,7 @@ namespace PA_PrefabBuilder
         }
 
         /// <summary>
-        /// Converts this event to a json format
+        /// Converts this event to a json format.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
@@ -102,21 +102,21 @@ namespace PA_PrefabBuilder
             string Out;
             if (Type == EventType.pos || Type == EventType.sca)
             {
-                Out = "{\"t\":\"" +
+                Out = "\n{\n\"t\":\"" +
                       Time +
-                      "\",\"x\":\"" +
+                      "\",\n\"x\":\"" +
                       X +
-                      "\",\"y\":\"" +
+                      "\",\n\"y\":\"" +
                       Y +
-                      "\",\"ct\":\"" +
+                      "\",\n\"ct\":\"" +
                       Ease;
                 if (Random != RandomMode.None)
                 {
-                    Out += "\",\"r\":\"" +
+                    Out += "\",\n\"r\":\"" +
                            (byte)Random +
-                           "\",\"rx\":\"" +
+                           "\",\n\"rx\":\"" +
                            RandomX +
-                           "\",\"ry\":\"" +
+                           "\",\n\"ry\":\"" +
                            RandomY;
                     if (Random != RandomMode.Select)
                         Out += "\",\"rz\":\"" +
@@ -125,56 +125,58 @@ namespace PA_PrefabBuilder
             }
             else if (Type == EventType.rot)
             {
-                Out = "{\"t\":\"" +
+                Out = "\n{\n\"t\":\"" +
                       Time +
-                      "\",\"x\":\"" +
+                      "\",\n\"x\":\"" +
                       X +
-                      "\",\"ct\":\"" +
+                      "\",\n\"ct\":\"" +
                       Ease;
                 if (Random != RandomMode.None)
                 {
-                    Out += "\",\"r\":\"" +
+                    Out += "\",\n\"r\":\"" +
                            (byte)Random +
-                           "\",\"rx\":\"" +
+                           "\",\n\"rx\":\"" +
                            RandomX +
-                           "\",\"ry\":\"" +
+                           "\",\n\"ry\":\"" +
                            RandomY;
                     if (Random != RandomMode.Select)
-                        Out += "\",\"rz\":\"" +
+                        Out += "\",\n\"rz\":\"" +
                                RandomInterval;
                 }
             }
             else
             {
-                Out = "{\"t\":\"" +
+                Out = "\n{\n\"t\":\"" +
                       Time +
-                      "\",\"x\":\"" +
+                      "\",\n\"x\":\"" +
                       X +
-                      "\",\"ct\":\"" +
+                      "\",\n\"ct\":\"" +
                       Ease;
             }
-            Out += "\"}";
+            Out += "\"\n}";
 
             return Out;
         }
     }
 
     /// <summary>
-    /// Game object
+    /// Game object.
     /// </summary>
     public class GameObject
     {
         public string ID = "", Name = "", Parent = "", Text = "Sample text (Original meme ikr)";
         public bool Helper = false, Autokill = true, Empty = false;
+
         public int
             Depth = 15,
-            StartTime = 0,
             ShapeVariant = 0,
-            OffsetX = 0,
-            OffsetY = 0,
             Bin = 0,
             Layer = 0,
             ParentSettings = 101;
+        public float 
+            StartTime = 0,
+            OffsetX = 0,
+            OffsetY = 0;
 
         public Shapes Shape = Shapes.Square;
 
@@ -208,10 +210,14 @@ namespace PA_PrefabBuilder
         }
 
         /// <summary>
-        /// Sets the starting position of this object
+        /// Sets the starting position of this object.
         /// </summary>
         /// <param name="X"></param>
         /// <param name="Y"></param>
+        /// <param name="Random">Random Mode</param>
+        /// <param name="RandomX"></param>
+        /// <param name="RandomY"></param>
+        /// <param name="RandomInterval">Constant distance between random numbers</param>
         public void SetPosition(float X, float Y, RandomMode Random, float RandomX, float RandomY, float RandomInterval)
         {
             PosEvents[0].X = X;
@@ -225,8 +231,12 @@ namespace PA_PrefabBuilder
         /// <summary>
         /// Sets the starting scale of this object
         /// </summary>
-        /// <param name="X"></param>
-        /// <param name="Y"></param>
+        /// <param name="X">X Scale</param>
+        /// <param name="Y">Y Scale</param>
+        /// <param name="Random">Random Mode</param>
+        /// <param name="RandomX">X Scale</param>
+        /// <param name="RandomY">Y Scale</param>
+        /// <param name="RandomInterval">Constant distance between random numbers</param>
         public void SetScale(float X, float Y, RandomMode Random, float RandomX, float RandomY, float RandomInterval)
         {
             ScaEvents[0].X = X;
@@ -241,6 +251,9 @@ namespace PA_PrefabBuilder
         /// Sets the starting rotation of this object
         /// </summary>
         /// <param name="Angle"></param>
+        /// <param name="Random">Random Mode</param>
+        /// <param name="RandomAngle"></param>
+        /// <param name="RandomInterval">Constant distance between random numbers</param>
         public void SetRotation(float Angle, RandomMode Random, float RandomAngle, float RandomInterval)
         {
             RotEvents[0].X = Angle;
@@ -263,8 +276,8 @@ namespace PA_PrefabBuilder
         /// <summary>
         /// Sets the starting scale of this object
         /// </summary>
-        /// <param name="X"></param>
-        /// <param name="Y"></param>
+        /// <param name="X">X Scale</param>
+        /// <param name="Y">Y Scale</param>
         public void SetScale(float X, float Y)
         {
             ScaEvents[0].X = X;
@@ -293,18 +306,20 @@ namespace PA_PrefabBuilder
         /// Adds an event to this object
         /// </summary>
         /// <param name="Type"></param>
-        /// <param name="Time"></param>
+        /// <param name="Time">Event placement on the event timeline</param>
         /// <param name="X"></param>
         /// <param name="Y"></param>
-        /// <param name="Ease"></param>
+        /// <param name="Ease">Easing mode for this event</param>
         public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease)
         {
-            Event e = new Event(Type, Time);
+            Event e = new Event(Type, Time)
+            {
+                X = X,
+                Ease = Ease
+            };
 
-            e.X = X;
             if (Y != null)
                 e.Y = (float)Y;
-            e.Ease = Ease;
 
             switch (Type)
             {
@@ -327,20 +342,27 @@ namespace PA_PrefabBuilder
         /// Adds an event to this object
         /// </summary>
         /// <param name="Type"></param>
-        /// <param name="Time"></param>
+        /// <param name="Time">Event placement on the event timeline</param>
         /// <param name="X"></param>
         /// <param name="Y"></param>
-        /// <param name="Ease"></param>
-        public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease, RandomMode Random, float RandomX, float? RandomY)
+        /// <param name="Ease">Easing mode for this event</param>
+        /// <param name="Random">Random Mode</param>
+        /// <param name="RandomX"></param>
+        /// <param name="RandomY"></param>
+        /// <param name="RandomInterval">Constant distance between random numbers</param>
+        public void AddEvent(EventType Type, float Time, float X, float? Y, Easing Ease, RandomMode Random, float RandomX, float? RandomY, float RandomInterval)
         {
-            Event e = new Event(Type, Time);
+            Event e = new Event(Type, Time)
+            {
+                X = X,
+                Random = Random,
+                RandomX = RandomX,
+                RandomInterval = RandomInterval,
+                Ease = Ease
+            };
 
-            e.X = X;
             if (Y != null)
                 e.Y = (float)Y;
-            e.Ease = Ease;
-            e.Random = Random;
-            e.RandomX = RandomX;
             if (RandomY != null)
                 e.RandomY = (float)RandomY;
 
@@ -367,7 +389,7 @@ namespace PA_PrefabBuilder
         /// <returns></returns>
         public override string ToString()
         {
-            var StringEvents = "\"events\":{\"pos\":[";
+            var StringEvents = "\"events\":{\n\"pos\":[";
             for (int i = 0; i < PosEvents.Count; i++)
             {
                 if (i != 0)
@@ -375,7 +397,7 @@ namespace PA_PrefabBuilder
                 StringEvents += PosEvents[i];
             }
 
-            StringEvents += "],\"sca\":[";
+            StringEvents += "\n],\n\"sca\":[";
             for (int i = 0; i < ScaEvents.Count; i++)
             {
                 if (i != 0)
@@ -383,7 +405,7 @@ namespace PA_PrefabBuilder
                 StringEvents += ScaEvents[i];
             }
 
-            StringEvents += "],\"rot\":[";
+            StringEvents += "\n],\n\"rot\":[";
             for (int i = 0; i < RotEvents.Count; i++)
             {
                 if (i != 0)
@@ -391,7 +413,7 @@ namespace PA_PrefabBuilder
                 StringEvents += RotEvents[i];
             }
 
-            StringEvents += "],\"col\":[";
+            StringEvents += "\n],\n\"col\":[";
             for (int i = 0; i < ColEvents.Count; i++)
             {
                 if (i != 0)
@@ -399,41 +421,41 @@ namespace PA_PrefabBuilder
                 StringEvents += ColEvents[i];
             }
 
-            var Out = "{\"id\":\"" +
+            var Out = "{\n\"id\":\"" +
                       ID +
-                      "\",\"name\":\"" +
+                      "\",\n\"name\":\"" +
                       Name +
-                      "\",\"p\":\"" +
+                      "\",\n\"p\":\"" +
                       Parent +
-                      "\",\"pt\":\"" +
+                      "\",\n\"pt\":\"" +
                       ParentSettings +
-                      "\",\"d\":\"" +
+                      "\",\n\"d\":\"" +
                       Depth +
-                      "\",\"h\":\"" +
+                      "\",\n\"h\":\"" +
                       Helper +
-                      "\",\"ak\":\"" +
+                      "\",\n\"ak\":\"" +
                       Autokill +
-                      "\",\"empty\":\"" +
+                      "\",\n\"empty\":\"" +
                       Empty +
-                      "\",\"st\":\"" +
+                      "\",\n\"st\":\"" +
                       StartTime +
-                      "\",\"shape\":\"" +
+                      "\",\n\"shape\":\"" +
                       (int)Shape +
-                      "\",\"so\":\"" +
+                      "\",\n\"so\":\"" +
                       ShapeVariant +
-                      "\",\"text\":\"" +
+                      "\",\n\"text\":\"" +
                       Text +
-                      "\",\"o\":{\"x\":\"" +
+                      "\",\n\"o\":{\"x\":\"" +
                       OffsetX +
-                      "\",\"y\":\"" +
+                      "\",\n\"y\":\"" +
                       OffsetY +
-                      "\"},\"ed\":{\"bin\":\"" +
+                      "\"},\n\"ed\":{\n\"bin\":\"" +
                       Bin +
-                      "\",\"layer\":\"" +
+                      "\",\n\"layer\":\"" +
                       Layer +
-                      "\"}," +
+                      "\"\n},\n" +
                       StringEvents +
-                      "]}}";
+                      "\n]\n}\n}";
 
             return Out;
         }
@@ -441,9 +463,10 @@ namespace PA_PrefabBuilder
 
     public class PrefabBuilder
     {
-        private string Name;
-        private PrefabType Type;
-        private int Offset;
+        private readonly string Name;
+        private readonly PrefabType Type;
+        private string ImportedObjects = "";
+        private readonly int Offset;
         public List<GameObject> Objects = new List<GameObject>();
 
         public PrefabBuilder(string name, PrefabType type, int offset)
@@ -452,11 +475,34 @@ namespace PA_PrefabBuilder
             Type = type;
             Offset = offset;
         }
+        
+        /// <summary>
+        /// Takes all objects from an existing prefabs and places them in the current prefab.
+        /// Note: All imported objects are json formatted.
+        /// </summary>
+        /// <param name="PrefabPath">Path to the prefab</param>
+        public void ImportPrefab(string PrefabPath)
+        {
+            using (StreamReader sr = new StreamReader(PrefabPath))
+            {
+                // Get rid of the junk
+                sr.ReadLine();
+                sr.ReadLine();
+                sr.ReadLine();
+                sr.ReadLine();
+                sr.ReadLine();
+
+                string data = sr.ReadToEnd();
+                if (ImportedObjects.Length != 0)
+                    ImportedObjects += ",\n";
+                ImportedObjects += data.Remove(data.Length - 3, 3);
+            }
+        }
 
         /// <summary>
-        /// Finalizes and exports this prefab to a prefab file
+        /// Finalizes and exports this prefab to a prefab file.
         /// </summary>
-        /// <param name="PrefabFolder"></param>
+        /// <param name="PrefabFolder">Location of all prefabs</param>
         public void Export(string PrefabFolder)
         {
             if (Objects.Count > 0)
@@ -480,7 +526,7 @@ namespace PA_PrefabBuilder
         }
 
         /// <summary>
-        /// Converts this prefab to a json format
+        /// Converts this prefab to a json format.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
@@ -490,19 +536,23 @@ namespace PA_PrefabBuilder
             for (int i = 0; i < Objects.Count; i++)
             {
                 if (i != 0)
-                    StrObjects += ',';
+                    StrObjects += ",\n";
                 StrObjects += Objects[i].ToString();
             }
 
-            return "{\"name\":\"" +
+            if (Objects.Count > 0)
+                StrObjects += ",\n";
+            StrObjects += ImportedObjects;
+
+            return "{\n\"name\":\"" +
                    Name +
-                   "\",\"type\":\"" +
+                   "\",\n\"type\":\"" +
                    (byte)Type +
-                   "\",\"offset\":\"" +
+                   "\",\n\"offset\":\"" +
                    Offset +
-                   "\",\"objects\":[" +
+                   "\",\n\"objects\":[\n" +
                    StrObjects +
-                   "]}".Replace("\\", string.Empty);
+                   "\n]\n}".Replace("\\", string.Empty);
         }
     }
 }
