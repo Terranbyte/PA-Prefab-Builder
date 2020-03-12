@@ -2,7 +2,7 @@
 A C# library used to create prefabs in the game [Project Arrhythmia](https://store.steampowered.com/app/440310/Project_Arrhythmia/).
 
 **Importaint!**
-This library is unfinished, this means it has bugs, missing features and other things incomplete things don't have. This tutorial is also unfinished due to the library not being finished.
+This library is finished, but it most likely bugs.
 If you encounter any bugs/mistakes or you have a feature request, please DM me on Discord (Terranbyte#1691)
 ## Installing the library (VS 2019)
 
