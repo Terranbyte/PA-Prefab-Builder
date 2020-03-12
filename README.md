@@ -173,7 +173,6 @@ class Program
 ```
 
 # Reference Sheet
-Event:
 |Class|Method|Parameters|Description|
 |--|--|--|--|
 |Event|Clone|None|Returns a deep copy of the calling object.|
