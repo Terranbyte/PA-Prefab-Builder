@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace PA_PrefabBuilder
 {
@@ -76,11 +80,17 @@ namespace PA_PrefabBuilder
     /// </summary>
     public class Event
     {
+
         public EventType Type;
         public Easing Ease = Easing.Linear;
         public RandomMode Random = RandomMode.None;
 
-        public float Time, X = 0, Y = 0, RandomX = 0, RandomY = 0, RandomInterval = 0;
+        public float Time;
+        public float X = 0;
+        public float Y = 0;
+        public float RandomX = 0;
+        public float RandomY = 0;
+        public float RandomInterval = 0;
 
         public Event(EventType type, float time)
         {
@@ -91,6 +101,26 @@ namespace PA_PrefabBuilder
                 X = 2;
                 Y = 2;
             }
+        }
+
+        public Event(Event Base)
+        {
+            this.Type = Base.Type;
+            this.Ease = Base.Ease;
+            this.Random = Base.Random;
+
+            this.Time = Base.Time;
+            this.X = Base.X;
+            this.Y = Base.Y;
+            this.RandomX = Base.RandomX;
+            this.RandomY = Base.RandomY;
+            this.RandomInterval = Base.RandomInterval;
+        }
+
+        public Event Clone()
+        {
+            Event newEvent = new Event(this);
+            return newEvent;
         }
 
         /// <summary>
@@ -164,26 +194,31 @@ namespace PA_PrefabBuilder
     /// </summary>
     public class GameObject
     {
-        public string ID = "", Name = "", Parent = "", Text = "Sample text (Original meme ikr)";
-        public bool Helper = false, Autokill = true, Empty = false;
+        public string ID = "";
+        public string Name = "";
+        public string Parent = "";
+        public string Text = "Sample text (Original meme ikr)";
 
-        public int
-            Depth = 15,
-            ShapeVariant = 0,
-            Bin = 0,
-            Layer = 0,
-            ParentSettings = 101;
-        public float 
-            StartTime = 0,
-            OffsetX = 0,
-            OffsetY = 0;
+        public bool Helper = false;
+        public bool Autokill = true;
+        public bool Empty = false;
+
+        public int Depth = 15;
+        public int ShapeVariant = 0;
+        public int Bin = 0;
+        public int Layer = 0;
+        public int ParentSettings = 101;
+
+        public float StartTime = 0;
+        public float OffsetX = 0;
+        public float OffsetY = 0;
 
         public Shapes Shape = Shapes.Square;
 
-        readonly List<Event> PosEvents = new List<Event> { new Event(EventType.pos, 0) };
-        readonly List<Event> ScaEvents = new List<Event> { new Event(EventType.sca, 0) };
-        readonly List<Event> RotEvents = new List<Event> { new Event(EventType.rot, 0) };
-        readonly List<Event> ColEvents = new List<Event> { new Event(EventType.col, 0) };
+        private readonly List<Event> PosEvents = new List<Event> { new Event(EventType.pos, 0) };
+        private readonly List<Event> ScaEvents = new List<Event> { new Event(EventType.sca, 0) };
+        private readonly List<Event> RotEvents = new List<Event> { new Event(EventType.rot, 0) };
+        private readonly List<Event> ColEvents = new List<Event> { new Event(EventType.col, 0) };
 
         public GameObject(string ID, string Name, Shapes Shape)
         {
@@ -207,6 +242,35 @@ namespace PA_PrefabBuilder
             this.Shape = Shape;
             this.Parent = Parent;
             this.ParentSettings = ParentSettings;
+        }
+
+        public GameObject(GameObject Base)
+        {
+            this.ID = Base.ID;
+            this.Name = Base.Name;
+            this.Parent = Base.Parent;
+            this.Text = Base.Text;
+            
+            this.Autokill = Base.Autokill;
+            this.Empty = Base.Empty;
+            this.Helper = Base.Helper;
+            
+            this.Depth = Base.Depth;
+            this.ShapeVariant = Base.ShapeVariant;
+            this.Bin = Base.Bin;
+            this.Layer = Base.Layer;
+            this.ParentSettings = Base.ParentSettings;
+
+            this.StartTime = Base.StartTime;
+            this.OffsetX = Base.OffsetX;
+            this.OffsetY = Base.OffsetY;
+
+            this.Shape = Base.Shape;
+
+            this.PosEvents = Base.PosEvents.ConvertAll(GameEvent => new Event(GameEvent.Clone()));
+            this.ScaEvents = Base.ScaEvents.ConvertAll(GameEvent => new Event(GameEvent.Clone()));
+            this.RotEvents = Base.RotEvents.ConvertAll(GameEvent => new Event(GameEvent.Clone()));
+            this.ColEvents = Base.ColEvents.ConvertAll(GameEvent => new Event(GameEvent.Clone()));
         }
 
         /// <summary>
@@ -384,6 +448,51 @@ namespace PA_PrefabBuilder
         }
 
         /// <summary>
+        /// Remove an event at the specified index
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <param name="Index"></param>
+        public void RemoveEvent(EventType Type, int Index)
+        {
+            switch (Type)
+            {
+                case EventType.pos:
+                    PosEvents.RemoveAt(Index);
+                    break;
+                case EventType.sca:
+                    ScaEvents.RemoveAt(Index);
+                    break;
+                case EventType.rot:
+                    RotEvents.RemoveAt(Index);
+                    break;
+                case EventType.col:
+                    ColEvents.RemoveAt(Index);
+                    break;
+            }
+        }
+
+        public List<Event> GetEventList(EventType Type)
+        {
+            switch (Type)
+            {
+                case EventType.pos:
+                    return PosEvents;
+                case EventType.sca:
+                    return ScaEvents;
+                case EventType.rot:
+                    return RotEvents;
+                default:
+                    return ColEvents;
+            }
+        }
+
+        public GameObject Clone()
+        {
+            GameObject Object = new GameObject(this);
+            return Object;
+        }
+
+        /// <summary>
         /// Converts this object to a json format
         /// </summary>
         /// <returns></returns>
@@ -445,11 +554,11 @@ namespace PA_PrefabBuilder
                       ShapeVariant +
                       "\",\n\"text\":\"" +
                       Text +
-                      "\",\n\"o\":{\"x\":\"" +
+                      "\",\n\"o\":{\n\"x\":\"" +
                       OffsetX +
                       "\",\n\"y\":\"" +
                       OffsetY +
-                      "\"},\n\"ed\":{\n\"bin\":\"" +
+                      "\"\n},\n\"ed\":{\n\"bin\":\"" +
                       Bin +
                       "\",\n\"layer\":\"" +
                       Layer +
@@ -465,7 +574,6 @@ namespace PA_PrefabBuilder
     {
         private readonly string Name;
         private readonly PrefabType Type;
-        private string ImportedObjects = "";
         private readonly int Offset;
         public List<GameObject> Objects = new List<GameObject>();
 
@@ -475,13 +583,13 @@ namespace PA_PrefabBuilder
             Type = type;
             Offset = offset;
         }
-        
+
         /// <summary>
-        /// Takes all objects from an existing prefabs and places them in the current prefab.
-        /// Note: All imported objects are json formatted.
+        /// Takes all objects from a prefab and returns them.
+        /// Note: If the prefab contains a single object it's returned as a GameObject, otherwise it's returned as a GameObject List.
         /// </summary>
         /// <param name="PrefabPath">Path to the prefab</param>
-        public void ImportPrefab(string PrefabPath)
+        public dynamic ImportPrefab(string PrefabPath)
         {
             using (StreamReader sr = new StreamReader(PrefabPath))
             {
@@ -490,12 +598,177 @@ namespace PA_PrefabBuilder
                 sr.ReadLine();
                 sr.ReadLine();
                 sr.ReadLine();
-                sr.ReadLine();
 
+                List<GameObject> objects = new List<GameObject>();
                 string data = sr.ReadToEnd();
-                if (ImportedObjects.Length != 0)
-                    ImportedObjects += ",\n";
-                ImportedObjects += data.Remove(data.Length - 3, 3);
+                data = data.Insert(0, "{\n");
+
+                JObject rss = JObject.Parse(data);
+                JArray objectArray = rss["objects"] as JArray;
+
+                if (objectArray == null)
+                {
+                    throw new NullReferenceException();
+                }
+
+                foreach (var Object in objectArray)
+                {
+                    JObject Events = Object["events"] as JObject;
+
+                    JArray pos = Events["pos"] as JArray;
+                    JArray sca = Events["sca"] as JArray;
+                    JArray rot = Events["rot"] as JArray;
+                    JArray col = Events["col"] as JArray;
+
+                    byte shape = 99;
+                    byte.TryParse((string) Object["so"], out shape);
+                    if (shape == 99)
+                    {
+                        shape = 0;
+                    }
+                    JObject editor = Object["ed"] as JObject;
+                    JObject offset = Object["o"] as JObject;
+
+                    string id = (string) Object["id"], name = (string) Object["name"], parent = (string) Object["p"], text = (string) Object["text"];
+                    int? pt = (int?) Object["pt"], d = (int?) Object["d"], so = (int?) Object["so"];
+                    pt ??= 101;
+                    d ??= 15;
+                    so ??= 0;
+
+                    bool? ak = (bool?) Object["ak"], empty = (bool?)Object["empty"], h = (bool) Object["h"];
+                    ak ??= false;
+                    empty ??= false;
+
+                    float? st = (float?) Object["st"];
+                    st ??= 0;
+
+                    GameObject obj = new GameObject(id, name, (Shapes)shape, parent, (int)pt);
+
+                    obj.GetEventList(EventType.pos).Clear();
+                    obj.GetEventList(EventType.sca).Clear();
+                    obj.GetEventList(EventType.rot).Clear();
+                    obj.GetEventList(EventType.col).Clear();
+
+                    if (editor != null)
+                    {
+                        obj.Bin = (int) editor["bin"];
+                        obj.Layer = (int) editor["layer"];
+                    }
+
+                    if (offset != null)
+                    {
+                        obj.OffsetX = (float) offset["x"];
+                        obj.OffsetY = (float) offset["y"];
+                    }
+
+                    obj.Autokill = (bool) ak;
+                    obj.Depth = (int) d;
+                    obj.Empty = (bool) empty;
+                    obj.Helper = (bool) h;
+                    obj.ShapeVariant = (int) so;
+                    obj.StartTime = (float) st;
+                    obj.Text = (string) text;
+
+                    foreach (var Event in pos)
+                    {
+                        Easing ct = Easing.Linear;
+                        Easing.TryParse((string) Event["ct"], out ct);
+                        
+                        float t = (float) Event["t"], x = (float) Event["x"];
+                        float? y = (float?) Event["y"];
+                        y ??= 0;
+                        
+                        RandomMode r = RandomMode.None;
+                        RandomMode.TryParse((string) Event["r"], out r);
+
+                        float? rx = (int?) Event["rx"];
+                        float? ry = (int?) Event["ry"];
+                        float? rz = (int?) Event["rz"];
+
+                        if (r == RandomMode.None)
+                        {
+                            obj.AddEvent(EventType.pos, t, x, y, ct);
+                        }
+                        else
+                        {
+                            obj.AddEvent(EventType.pos, t, x, y, ct, r, (float) rx, ry, (float) rz);
+                        }
+                    }
+
+                    foreach (var Event in sca)
+                    {
+                        Easing ct = Easing.Linear;
+                        Easing.TryParse((string)Event["ct"], out ct);
+
+                        float t = (float)Event["t"], x = (float)Event["x"];
+                        float? y = (float?)Event["y"];
+                        y ??= 0;
+
+                        RandomMode r = RandomMode.None;
+                        RandomMode.TryParse((string)Event["r"], out r);
+
+                        float? rx = (int?)Event["rx"];
+                        float? ry = (int?)Event["ry"];
+                        float? rz = (int?)Event["rz"];
+
+                        if (r == RandomMode.None)
+                        {
+                            obj.AddEvent(EventType.sca, t, x, y, ct);
+                        }
+                        else
+                        {
+                            obj.AddEvent(EventType.sca, t, x, y, ct, r, (float)rx, ry, (float)rz);
+                        }
+                    }
+
+                    foreach (var Event in rot)
+                    {
+                        Easing ct = Easing.Linear;
+                        Easing.TryParse((string)Event["ct"], out ct);
+
+                        float t = (float)Event["t"], x = (float)Event["x"];
+                        float? y = (float?)Event["y"];
+                        y ??= 0;
+
+                        RandomMode r = RandomMode.None;
+                        RandomMode.TryParse((string)Event["r"], out r);
+
+                        float? rx = (int?)Event["rx"];
+                        float? rz = (int?)Event["rz"];
+
+                        if (r == RandomMode.None)
+                        {
+                            obj.AddEvent(EventType.rot, t, x, y, ct);
+                        }
+                        else
+                        {
+                            obj.AddEvent(EventType.rot, t, x, y, ct, r, (float)rx, null, (float)rz);
+                        }
+                    }
+
+                    foreach (var Event in col)
+                    {
+                        Easing ct = Easing.Linear;
+                        Easing.TryParse((string)Event["ct"], out ct);
+
+                        float t = (float)Event["t"], x = (float)Event["x"];
+                        float? y = (float?)Event["y"];
+                        y ??= 0;
+                        
+                        obj.AddEvent(EventType.col, t, x, y, ct);
+                    }
+
+                    objects.Add(obj);
+                }
+
+                if (objects.Count > 1)
+                {
+                    return objects;
+                }
+                else
+                {
+                    return objects[0];
+                }
             }
         }
 
@@ -539,11 +812,7 @@ namespace PA_PrefabBuilder
                     StrObjects += ",\n";
                 StrObjects += Objects[i].ToString();
             }
-
-            if (Objects.Count > 0)
-                StrObjects += ",\n";
-            StrObjects += ImportedObjects;
-
+            
             return "{\n\"name\":\"" +
                    Name +
                    "\",\n\"type\":\"" +
@@ -552,7 +821,7 @@ namespace PA_PrefabBuilder
                    Offset +
                    "\",\n\"objects\":[\n" +
                    StrObjects +
-                   "\n]\n}".Replace("\\", string.Empty);
+                   "\n]\n}";
         }
     }
 }
