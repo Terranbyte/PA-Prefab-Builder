@@ -1,3 +1,4 @@
+
 # Project Arrhythmia Prefab Builder
 A C# library used to create prefabs in the game [Project Arrhythmia](https://store.steampowered.com/app/440310/Project_Arrhythmia/).
 
@@ -6,7 +7,7 @@ This library is finished, but it most likely bugs.
 If you encounter any bugs/mistakes or you have a feature request, please DM me on Discord (Terranbyte#1691)
 ## Installing the library (VS 2019)
 
- 1. Download the latest version of the DLL from [here](https://github.com/Terranbyte/PA-Prefab-Builder/releases/download/v1.0/PrefabBuilder.dll).
+ 1. Download the latest version of the DLL from [here](https://github.com/Terranbyte/PA-Prefab-Builder/releases/download/v1.1/PrefabBuilder.dll).
  2. Right-click the References tab in your solution explorer.
  3. Click "Add reference...".
  4. Locate and select the DLL.
@@ -25,6 +26,24 @@ after this an object needs to be defined. The Object class has three constructor
 ```cs
 GameObject obj = new Object("0", "My First Object", Shapes.Square);
 ```
+All GameObjects have multiple autokill modes, they can be chosen like this:
+```cs
+obj.AutokillMode = Autokill.LastKF; // Kills object after the last event
+obj.AutokillMode = Autokill.LastKFOffset; // Kills object with a certain offset after the last event
+obj.AutokillMode = Autokill.FixedTime; // Kills object after a set time relative to the objects creation
+obj.AutokillMode = Autokill.SongTime; // Kills object when song reaches a set time point
+
+obj.AutokillTime = 10 // Isn't used with the autokill mode LastKF
+```
+
+GameObjects also contain an object type which indicate what type of object it is in-game
+```cs
+obj.Type = ObjectType.Empty; // Doesn't have a render model
+obj.Type = ObjectType.Normal; // Has a render model and can deal damage
+obj.Type = ObjectType.Decoration; // Has a render model but cannot deal damage
+obj.Type = ObjectType.Helper; // Like decoration but it renders at 50% opacity
+```
+
 To edit the start events of an object use the following functions
 ```cs
 obj.SetPosition();
@@ -165,6 +184,59 @@ class Program
             pb.Objects.Add(obj1);
             pb.Objects.Add(obj2);
             Angle += (float)Math.PI / 10;
+        }
+
+        pb.Export(@"C:\Program Files (x86)\Steam\steamapps\common\Project Arrhythmia\beatmaps\prefabs");
+    }
+}
+```
+**Creating Spray bullets**
+```cs
+using System;
+using PA_PrefabBuilder;
+
+class Program
+{
+    static void Main()
+    {
+        PrefabBuilder pb = new PrefabBuilder("Wicked box bullets", PrefabType.Bullets, 0);
+        double Angle1 = Math.PI / 50;
+        double Angle2 = Angle1 * 2;
+        float time = 0;
+        int i = 0;
+
+        GameObject cp = new GameObject("0", "cp", Shapes.Square);
+        cp.Type = ObjectType.Empty;
+
+        pb.Objects.Add(cp);
+
+        while (time < 3.65f)
+        {
+            GameObject bullet = new GameObject((i + 1).ToString(), "bullet", Shapes.Square, "0");
+            bullet.StartTime = time;
+            bullet.Bin = 1;
+
+            bullet.SetScale(1.25f, 1.25f);
+            bullet.AddEvent(EventType.rot, 2.5f, 360, null, Easing.Linear, RandomMode.Select, -360, null, 0);
+
+            if (i % 3 == 1)
+            {
+                bullet.AddEvent(EventType.pos, 2.5f, -100 * (float)Math.Sin(Angle2), -100 * (float)Math.Cos(Angle1), Easing.Linear);
+            }
+            else
+            {
+                bullet.AddEvent(EventType.pos, 2.5f, -100 * (float)Math.Sin(Angle1), -100 * (float)Math.Cos(Angle2), Easing.Linear);
+            }
+
+            ++i;
+            time += 0.05f;
+            if (i % 3 == 0)
+            {
+                Angle1 = -Angle1;
+                Angle2 = -Angle2;
+            }
+
+            pb.Objects.Add(bullet);
         }
 
         pb.Export(@"C:\Program Files (x86)\Steam\steamapps\common\Project Arrhythmia\beatmaps\prefabs");
