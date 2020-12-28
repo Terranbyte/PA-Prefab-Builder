@@ -1,4 +1,5 @@
 
+
 # Project Arrhythmia Prefab Builder
 A C# library used to create prefabs in the game [Project Arrhythmia](https://store.steampowered.com/app/440310/Project_Arrhythmia/).
 
@@ -43,7 +44,10 @@ obj.Type = ObjectType.Normal; // Has a render model and can deal damage
 obj.Type = ObjectType.Decoration; // Has a render model but cannot deal damage
 obj.Type = ObjectType.Helper; // Like decoration but it renders at 50% opacity
 ```
-
+You might create some objects that last a long time, you can compress these objects in the editors timeline by setting the CompressInEditor field to true.
+```cs
+obj.CompressInEditor = true;
+```
 To edit the start events of an object use the following functions
 ```cs
 obj.SetPosition();
@@ -199,7 +203,7 @@ class Program
 {
     static void Main()
     {
-        PrefabBuilder pb = new PrefabBuilder("Wicked box bullets", PrefabType.Bullets, 0);
+        PrefabBuilder pb = new PrefabBuilder("Bullet Spray", PrefabType.Bullets, 0);
         double Angle1 = Math.PI / 50;
         double Angle2 = Angle1 * 2;
         float time = 0;
@@ -243,8 +247,27 @@ class Program
     }
 }
 ```
-
-# Reference Sheet
+# Field Reference Sheet
+|Class|Field|Type|Description|
+|--|--|--|--|
+|GameObject|ID|String|The ID of a game object, it can be any unique string you want.|
+|GameObject|Name|String|The in-game name of the game object.|
+|GameObject|Parent|String|The ID of the this game object's parent object, leave empty if there's no parent.|
+|GameObject|Text|String|The text a text object contains, note that this field is ignored by the game unless the shape is set to Text.|
+|GameObject|Type|ObjectType|The type of the game object. (Normal, Helper, Decoration or Empty) |
+|GameObject|CompressInEditor|bool|Controls if the object is compressed visually in the in-game editor.|
+|GameObject|Depth|int|The depth or Z layer of a game object.|
+|GameObject|ShapeVariant|int|Sets the variant of the game objects current shape, check the in-game editor for the correct number to use here. (The number of the variant from the right - 1)|
+|GameObject|Bin|int|The bin layer the object appears on in the in-game editor.|
+|GameObject|Layer|int|The layer the object appears in the in-game editor.|
+|GameObject|ParentSettings|int|Sets what values should be copied to this game object from its parent. This field uses the nnn format where the first n is position, the second n is scale and the third is rotation. Each n can only be a 1 or a 0 where 1 is true and 0 is false.|
+|GameObject|AutokillTime|float|The value used with the Autokill Mode, this value is ignored by the LastKF autokill mode.|
+|GameObject|StartTime|float|The start time of a game object.|
+|GameObject|OffsetX|float|The X pivot of a game object.|
+|GameObject|OffsetY|float|The Y pivot of a game object.|
+|GameObject|AutokillMode|Autokill|The autokill a game object uses.|
+|GameObject|Shape|Shapes|The shape of a game object.|
+# Method Reference Sheet
 |Class|Method|Parameters|Description|
 |--|--|--|--|
 |Event|Clone|None|Returns a deep copy of the calling object.|
