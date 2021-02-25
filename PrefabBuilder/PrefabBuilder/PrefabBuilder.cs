@@ -817,8 +817,7 @@ namespace PA_PrefabBuilder
             }
             else
             {
-                Console.Write("Cannot create empty prefab.");
-                throw new Exception();
+                throw new Exception("Cannot create empty prefab.");
             }
         }
 
